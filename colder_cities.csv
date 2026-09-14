@@ -1,0 +1,8 @@
+city,condition,local_time,source_url,scraped_at,temperature_f,temperature_c,country
+Anadyr,Snow flurries. Overcast. Chilly.,Fri 3:47 pm,https://www.timeanddate.com/weather/russia/anadyr,2026-09-04 03:47:52.737343+00:00,33,0.6,russia
+La Paz,Clear. Quite cool.,Thu 11:47 pm,https://www.timeanddate.com/weather/bolivia/la-paz,2026-09-04 03:47:52.737343+00:00,41,5.0,bolivia
+Stockholm,Light fog. Quite cool.,Fri 5:47 am,https://www.timeanddate.com/weather/sweden/stockholm,2026-09-04 03:47:52.737343+00:00,43,6.1,sweden
+Helsinki,Fog. Quite cool.,Fri 6:47 am,https://www.timeanddate.com/weather/finland/helsinki,2026-09-04 03:47:52.737343+00:00,43,6.1,finland
+Oslo,Clear. Quite cool.,Fri 5:47 am,https://www.timeanddate.com/weather/norway/oslo,2026-09-04 03:47:52.737343+00:00,45,7.2,norway
+Minsk,Passing clouds. Cool.,Fri 6:47 am,https://www.timeanddate.com/weather/belarus/minsk,2026-09-04 03:47:52.737343+00:00,48,8.9,belarus
+Reykjavik,Clear. Cool.,Fri 3:47 am,https://www.timeanddate.com/weather/iceland/reykjavik,2026-09-04 03:47:52.737343+00:00,50,10.0,iceland
