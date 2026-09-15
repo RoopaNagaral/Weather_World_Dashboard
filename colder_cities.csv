@@ -1,0 +1,10 @@
+city,condition,local_time,source_url,scraped_at,temperature_f,temperature_c,country
+Anadyr,Overcast. Chilly.,Tue 3:33 pm,https://www.timeanddate.com/weather/russia/anadyr,2026-09-15 03:33:58.870741+00:00,34,1.1,russia
+Helsinki,Clear. Chilly.,Tue 6:33 am,https://www.timeanddate.com/weather/finland/helsinki,2026-09-15 03:33:58.870741+00:00,36,2.2,finland
+Reykjavik,Clear. Quite cool.,Tue 3:33 am,https://www.timeanddate.com/weather/iceland/reykjavik,2026-09-15 03:33:58.870741+00:00,41,5.0,iceland
+Tallinn,Clear. Quite cool.,Tue 6:33 am,https://www.timeanddate.com/weather/estonia/tallinn,2026-09-15 03:33:58.870741+00:00,43,6.1,estonia
+Montevideo,Fog. Quite cool.,Tue 12:33 am,https://www.timeanddate.com/weather/uruguay/montevideo,2026-09-15 03:33:58.870741+00:00,43,6.1,uruguay
+Edmonton,Light rain. Passing clouds. Cool.,Mon 9:33 pm,https://www.timeanddate.com/weather/canada/edmonton,2026-09-15 03:33:58.870741+00:00,48,8.9,canada
+Ankara,Clear. Cool.,Tue 6:33 am,https://www.timeanddate.com/weather/turkey/ankara,2026-09-15 03:33:58.870741+00:00,48,8.9,turkey
+Ottawa,Clear. Cool.,Mon 11:33 pm,https://www.timeanddate.com/weather/canada/ottawa,2026-09-15 03:33:58.870741+00:00,48,8.9,canada
+Berlin,Clear. Cool.,Tue 5:33 am,https://www.timeanddate.com/weather/germany/berlin,2026-09-15 03:33:58.870741+00:00,48,8.9,germany
