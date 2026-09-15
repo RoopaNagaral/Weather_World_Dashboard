@@ -4,7 +4,7 @@ A weather exploration project built with Selenium, Pandas, SQLite, Plotly, and S
 
 ## Deployed Dashboard
 
-[Open the World Weather Dashboard](https://weatherworlddashboard-zzp8x9bnnvawrymfkbs4gh.streamlit.app/)
+[Open the World Weather Dashboard](https://weatherworlddashboard-tqqrc6xx5kqppi6n6pck2i.streamlit.app/)
 
 The dashboard displays saved weather observations. It does not automatically retrieve live weather. The latest scrape timestamp is displayed in the app.
 
