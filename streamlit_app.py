@@ -81,45 +81,20 @@ labels = {temperature_column: f"Temperature ({unit_label})", "country": "Country
 st.subheader("Average temperature by country")
 st.write("Compare average temperatures among the observations matching your filters.")
 summary = filtered.groupby("country", as_index=False)[temperature_column].mean().sort_values(temperature_column, ascending=False)
-country_chart = px.bar(
-    summary,
-    x=temperature_column,
-    y="country",
-    orientation="h",
-    labels=labels,
-    title="Average Temperature of Sampled Observations",
-    color_discrete_sequence=["cadetblue"],
-)
-country_chart.update_layout(
-    height=max(450, len(summary) * 24 + 150),
-    yaxis={"autorange": "reversed", "automargin": True},
-)
-st.plotly_chart(country_chart, use_container_width=True)
+
+avg_chart = px.bar(summary, x="country", y=temperature_column, labels=labels, title="Average Temperature of Sampled Observations", color_discrete_sequence=["cadetblue"])
+
+st.plotly_chart(avg_chart, use_container_width=True, height=800)
+
 
 st.subheader("Temperature distribution")
 st.write("See how frequently different temperatures occur in the filtered observations.")
+
 histogram = px.histogram(filtered, x=temperature_column, nbins=20, labels=labels, title="Distribution of Observed Temperatures", color_discrete_sequence=["royalblue"])
 histogram.update_layout(yaxis_title="Observations")
-st.plotly_chart(histogram, use_container_width=True)
+st.plotly_chart(histogram, use_container_width=True, height="stretch")
 
 st.subheader("Weather conditions")
 st.write("Compare the number of filtered observations reporting each weather condition.")
 counts = filtered.groupby("condition").size().reset_index(name="count").sort_values("count", ascending=False)
-condition_chart = px.bar(
-    counts,
-    x="count",
-    y="condition",
-    orientation="h",
-    labels=labels,
-    title="Observations by Weather Condition",
-    color_discrete_sequence=["lightcoral"],
-)
-condition_chart.update_layout(
-    height=max(450, len(counts) * 28 + 150),
-    yaxis={"autorange": "reversed", "automargin": True},
-)
-st.plotly_chart(condition_chart, use_container_width=True)
-with st.expander("View the filtered observations"):
-    display = filtered[["city", "country", "condition", temperature_column, "scraped_at"]].rename(columns={temperature_column: f"Temperature ({unit_label})"})
-    st.dataframe(display, hide_index=True, use_container_width=True)
-    st.download_button("Download filtered observations", display.to_csv(index=False), "filtered_weather.csv", "text/csv")
+st.plotly_chart(px.bar(counts, x="condition", y="count", labels=labels, title="Observations by Weather Condition", color_discrete_sequence=["lightcoral"]), use_container_width=True, height=800)
