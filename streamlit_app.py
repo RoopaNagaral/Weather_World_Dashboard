@@ -5,11 +5,9 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st  # Importing the Streamlit library
 
-st.set_page_config(page_title="World Weather Dashboard", layout="wide")
-st.title("World Weather Dashboard")
-st.write("Explore temperatures and weather conditions in the scraped city observations. Use the sidebar filters to update all three charts.")
-st.caption("This dashboard shows saved observations, not a live weather feed. Country averages describe the sampled observations only.")
-
+# -----------------------------
+# Load data from SQLite
+# -----------------------------
 database_path = Path(__file__).resolve().parent / "weather_data.db"
 if not database_path.is_file():
     st.error("Place weather_data.db inside streamlit.py before running the file")
@@ -21,22 +19,19 @@ try:
 except (sqlite3.Error, pd.errors.DatabaseError) as error:
     st.error(f"Unable to read clern_weather: {error}")
     st.stop()
-    
-df["temperature_c"] = pd.to_numeric(df["temperature_c"], errors="coerce")
-df["scraped_at"] = pd.to_datetime(df["scraped_at"], errors="coerce", utc=True)
-latest = df["scraped_at"].max()
 
-if pd.notna(latest):
-    st.caption(f"Latest scrape in database: {latest.strftime('%Y-%m-%d %H:%M UTC')}")
-for column in ["city", "country", "condition"]:
-    df[column] = df[column].fillna("Unknown").astype(str)
-missing_temperatures = df["temperature_c"].isna().sum()
-df = df.dropna(subset=["temperature_c"]).copy()
-if missing_temperatures:
-    st.caption(f"Excluded {missing_temperatures} observations with missing temperatures.")
-if df.empty:
-    st.warning("No observations with valid temperatures are available.")
-    st.stop()
+# -----------------------------
+# Dashboard Layout
+# -----------------------------
+st.set_page_config(page_title="World Weather Dashboard", layout="wide")
+st.title("🌎 Weather Around the World Dashboard")
+st.write("Explore global weather patterns using interactive visualizations. Use the filters to update all charts.")
+st.caption("This dashboard shows saved observations, not a live weather feed.")
+
+
+# -----------------------------
+# Filters
+# -----------------------------
 
 # Custom CSS to modify sidebar width
 st.markdown(
@@ -45,81 +40,105 @@ st.markdown(
     .st-emotion-cache-197vr8o {
         background-image: linear-gradient(#2e7bcf,#2e7bcf);
     }
+    .st-emotion-cache-119tkyc {
+        color: rgb(49, 51, 63);
+        font-size: 1em;
+        font-weight: 400;
+    }
+    .stSlider {
+        width: 400px; /* Change this to your desired width */
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
-   
+
+df["temperature_c"] = pd.to_numeric(df["temperature_c"], errors="coerce")
+df["scraped_at"] = pd.to_datetime(df["scraped_at"], errors="coerce", utc=True)
+latest = df["scraped_at"].max()
+
 st.sidebar.header("Explore Weather")
-countries = st.sidebar.multiselect("Countries", sorted(df["country"].unique()), default=sorted(df["country"].unique()))
-conditions = st.sidebar.multiselect("Weather Conditions", sorted(df["condition"].unique()), default=sorted(df["condition"].unique()))
+countries = sorted(df["country"].unique())
+selected_country = st.sidebar.selectbox("Select a country", countries, index=2)
 
 unit = st.sidebar.selectbox("Temperature Unit", ["Celsius", "Fahrenheit"])
-temperature_column = "display_temperature"
-df[temperature_column] = df["temperature_c"] if unit == "Celsius" else df["temperature_c"] * 9 / 5 + 32
+df["temperature_column"] = df["temperature_c"] if unit == "Celsius" else df["temperature_c"] * 9 / 5 + 32
+df["temperature_column"] = pd.to_numeric(df["temperature_column"], errors="coerce")
 unit_label = "°C" if unit == "Celsius" else "°F"
-low, high = float(df[temperature_column].min()), float(df[temperature_column].max())
-if low < high:
-    temperature_range = st.sidebar.slider(f"Temperature range ({unit_label})", low, high, (low, high))
-else:
-    temperature_range = (low, high)
+
 filtered = df[
-    df["country"].isin(countries)
-    & df["condition"].isin(conditions)
-    & df[temperature_column].between(*temperature_range)
+    (df["country"] == selected_country) & df["condition"] & df["temperature_column"]  
 ].copy()
 if filtered.empty:
     st.warning("No observations match these filters. Select more countries or conditions, or widen the temperature range.")
     st.stop()
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Matching observations", len(filtered))
-col2.metric("Countries", filtered["country"].nunique())
-col3.metric("Average temperature", f"{filtered[temperature_column].mean():.1f} {unit_label}")
-labels = {temperature_column: f"Temperature ({unit_label})", "country": "Country", "condition": "Weather Condition", "count": "Observations"}
+col1, col2 = st.columns(2)
+with col1:
+    temp_value = filtered["temperature_column"].iloc[0]
+    st.write("Country Temperature")
+    st.write(temp_value, unit_label)
+    
+with col2:
+    condition = filtered["condition"].iloc[0]
+    st.write("Weather Condition")
+    st.write(condition)
+    
+labels = {"temperature_column": f"Temperature ({unit_label})", "country": "Country", "condition": "Weather Condition", "count": "Observations"}
 
-st.subheader("Average temperature by country")
-st.write("Compare average temperatures among the observations matching your filters.")
-summary = filtered.groupby("country", as_index=False)[temperature_column].mean().sort_values(temperature_column, ascending=False)
-country_chart = px.bar(
-    summary,
-    x=temperature_column,
-    y="country",
-    orientation="h",
-    labels=labels,
-    title="Average Temperature of Sampled Observations",
-    color_discrete_sequence=["cadetblue"],
-)
-country_chart.update_layout(
-    height=max(450, len(summary) * 24 + 150),
-    yaxis={"autorange": "reversed", "automargin": True},
-)
-st.plotly_chart(country_chart, use_container_width=True)
+# -----------------------------
+# Visualization 1: Top Cities by Temperature (Bar Chart)
+# -----------------------------
+st.subheader("Top Cities by Temperature")
 
-st.subheader("Temperature distribution")
-st.write("See how frequently different temperatures occur in the filtered observations.")
-histogram = px.histogram(filtered, x=temperature_column, nbins=20, labels=labels, title="Distribution of Observed Temperatures", color_discrete_sequence=["royalblue"])
-histogram.update_layout(yaxis_title="Observations")
-st.plotly_chart(histogram, use_container_width=True)
+top_n = st.slider("Number of cities to display", 5, 20, 10)
+top_cities = filtered.nlargest(top_n, "temperature_column")
 
-st.subheader("Weather conditions")
-st.write("Compare the number of filtered observations reporting each weather condition.")
-counts = filtered.groupby("condition").size().reset_index(name="count").sort_values("count", ascending=False)
-condition_chart = px.bar(
-    counts,
-    x="count",
-    y="condition",
-    orientation="h",
-    labels=labels,
-    title="Observations by Weather Condition",
-    color_discrete_sequence=["lightcoral"],
+fig2 = px.bar(
+    top_cities,
+    x="city",
+    y="temperature_column",
+    color="temperature_column",
+    title=f"Top {top_n} Hottest Cities in {selected_country}",
+    labels={"city": "City", "temperature_column": "Temperature"},
 )
-condition_chart.update_layout(
-    height=max(450, len(counts) * 28 + 150),
-    yaxis={"autorange": "reversed", "automargin": True},
+st.plotly_chart(fig2, use_container_width=True)
+
+# -----------------------------
+# Visualization 2: Temperature Distribution (Histogram)
+# -----------------------------
+st.subheader("Temperature Distribution")
+fig1 = px.histogram(
+        filtered,
+        x="temperature_column",
+        nbins=20,
+        title=f"Temperature Distribution in {selected_country}",
+        labels={"temperature_column": "Temperature"},
+    )
+st.plotly_chart(fig1, use_container_width=True)
+
+# -----------------------------
+# Visualization 3: Compare Countries (Scatter Plot)
+# -----------------------------
+st.subheader("Compare Countries")
+compare_countries = st.multiselect(
+    "Select countries to compare",
+    countries,
+    default=[selected_country]
 )
-st.plotly_chart(condition_chart, use_container_width=True)
-with st.expander("View the filtered observations"):
-    display = filtered[["city", "country", "condition", temperature_column, "scraped_at"]].rename(columns={temperature_column: f"Temperature ({unit_label})"})
-    st.dataframe(display, hide_index=True, use_container_width=True)
-    st.download_button("Download filtered observations", display.to_csv(index=False), "filtered_weather.csv", "text/csv")
+
+compare_df = df[df["country"].isin(compare_countries)]
+
+fig3 = px.scatter(
+    compare_df,
+    x="city",
+    y="temperature_c",
+    color="country",
+    size="temperature_c",
+    hover_name="city",
+    title="Temperature Comparison Across Countries",
+    labels={"city": "City", "temperature_c": "Temperature", "country": "Country"},
+)
+st.plotly_chart(fig3, use_container_width=True)
+
+st.write("Use the filters above to explore the dataset.")
