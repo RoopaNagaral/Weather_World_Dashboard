@@ -59,15 +59,15 @@ latest = df["scraped_at"].max()
 
 st.sidebar.header("Explore Weather")
 countries = sorted(df["country"].unique())
-selected_country = st.sidebar.selectbox("Select a country", countries, index=2)
+selected_country = st.sidebar.selectbox("Select a country", countries)
 
 unit = st.sidebar.selectbox("Temperature Unit", ["Celsius", "Fahrenheit"])
 df["temperature_column"] = df["temperature_c"] if unit == "Celsius" else df["temperature_c"] * 9 / 5 + 32
-df["temperature_column"] = pd.to_numeric(df["temperature_column"], errors="coerce")
+df["temperature_column"] = pd.to_numeric(df["temperature_column"], errors="coerce").astype(int)
 unit_label = "°C" if unit == "Celsius" else "°F"
 
 filtered = df[
-    (df["country"] == selected_country) & df["condition"] & df["temperature_column"]  
+    (df["country"] == selected_country)
 ].copy()
 if filtered.empty:
     st.warning("No observations match these filters. Select more countries or conditions, or widen the temperature range.")

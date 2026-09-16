@@ -10,7 +10,7 @@ database_path = project_folder / "weather_data.db"
 csv_tables = {
     "raw_weather.csv" : "raw_weather",
     "clean_weather.csv":"clean_weather",
-    "country_tempreture_summary.csv": "country_tempreture_summary",
+    "country_temperature_summary.csv": "country_temperature_summary",
     "colder_cities.csv": "colder_cities"
 }
 
