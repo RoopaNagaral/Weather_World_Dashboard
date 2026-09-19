@@ -17,19 +17,19 @@ The cleaning script removes duplicates, handles missing values, converts Fahrenh
 - `raw_weather`
 - `clean_weather`
 - `country_temperature_summary`
-- `hot_cities`
+- `colder_cities`
 
-Country labels follow the website's URL categories. Country averages describe the sampled observations rather than national weather averages.
+Country labels follow the website's URL categories. 
 
 ## Dashboard Features
 
 The dashboard reads the `clean_weather` table from `weather_data.db` and displays:
 
-- Average temperature by country
-- Temperature distribution
-- Observation counts by weather condition
+- Hottest citeis of the selected country
+- Temperature distribution through the country
+- compare countries temperature
 
-Country, condition, and temperature-range filters update all three charts. Users can switch between Celsius and Fahrenheit, inspect filtered observations, and download them as CSV.
+Country, temperature unit , and cities range filters update all three charts. Users can switch between Celsius and Fahrenheit. Observe the temperature over the countries.
 
 ## Run Locally on Windows
 
@@ -48,8 +48,8 @@ Keep `weather_data.db` beside `streamlit_app.py`. The included database allows t
 The scraper requires Google Chrome. To collect new observations, clean them, and replace the database tables, run these commands in order from the main project folder:
 
 ```powershell
-.\.venv\Scripts\python.exe .\scrape-weather.py
-.\.venv\Scripts\python.exe .\clean-weather.py
+.\.venv\Scripts\python.exe .\scrape_weather.py
+.\.venv\Scripts\python.exe .\clean_weather.py
 .\.venv\Scripts\python.exe .\load-weather-db.py
 ```
 
@@ -57,15 +57,15 @@ These commands overwrite the saved CSV datasets and database tables. Updating th
 
 ## Project Files
 
-- `scrape-weather.py`: retrieves website observations
-- `clean-weather.py`: cleans data and creates summaries
+- `scrape_weather.py`: retrieves website observations
+- `clean_weather.py`: cleans data and creates summaries
 - `load-weather-db.py`: imports CSV datasets into SQLite
 - `streamlit_app.py`: runs the interactive dashboard
 - `weather_data.db`: saved SQLite database
 - `raw_weather.csv`: original observations
 - `clean_weather.csv`: cleaned observations
 - `country_temperature_summary.csv`: country summaries
-- `hot_cities.csv`: observations at or above 30°C
+- `colder_cities.csv`: observations at or below 10°C
 - `requirements.txt`: project dependencies
 - `service_urls.txt`: deployed dashboard URL
 
